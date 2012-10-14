@@ -25,31 +25,31 @@
 #ifndef YQSpacing_h
 #define YQSpacing_h
 
-#include <qwidget.h>
 #include <yui/YSpacing.h>
 
 
-class YQSpacing : public QWidget, public YSpacing
+class YQSpacing : public YSpacing
 {
-    Q_OBJECT
-
 public:
-    /**
-     * Constructor.
-     **/
-    YQSpacing( YWidget *	parent,
-	       YUIDimension 	dim,
-	       bool 		stretchable	= false,
-	       YLayoutSize_t 	layoutUnits	= 0.0 );
+  /**
+   * Constructor.
+   **/
+  YQSpacing ( YWidget *	parent,
+              YUIDimension 	dim,
+              bool 		stretchable	= false,
+              YLayoutSize_t 	layoutUnits	= 0.0 );
 
-    virtual ~YQSpacing();
+  virtual ~YQSpacing();
 
-    /**
-     * Set the new size of the widget.
-     *
-     * Reimplemented from YWidget.
-     **/
-    virtual void setSize( int newWidth, int newHeight );
+  /**
+   * Set the new size of the widget.
+   *
+   * Reimplemented from YWidget.
+   **/
+  virtual void setSize ( int newWidth, int newHeight );
+
+protected:
+  QSpacerItem *_spacer;
 };
 
 

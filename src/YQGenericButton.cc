@@ -38,37 +38,33 @@
 #include <yui/YEvent.h>
 #include "YQGenericButton.h"
 #include "YQDialog.h"
+#include "YQLayoutBox.h"
 
 
 YQGenericButton::YQGenericButton( YWidget *		parent,
 				  const std::string &	label )
-    : QWidget( (QWidget *) parent->widgetRep() )
+    : QPushButton( (QWidget *) parent->widgetRep() )
     , YPushButton( parent, label )
     , _dialog( 0 )
-    , _qPushButton( 0 )
 {
     setWidgetRep( 0 );
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    if (pParentLayout)
+    {
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+        std::cout << "pParent " << parent << " _pLayout " << pParentLayout << std::endl;
+
+        pLayout->addWidget(this);
+        pLayout->activate();
+      }
+    }
     QWidget* pParent =(QWidget *) parent->widgetRep();
     if (pParent)
     {
-        QLayout *pLayout = pParent->layout();
-        if (pLayout)
-        {
-            pLayout->addWidget(this);
-            pParent->update();
-            pLayout->activate();
-        }
+      pParent->update();
     }
-}
-
-
-void YQGenericButton::setQPushButton( QPushButton * pb )
-{
-    _qPushButton = pb;
-    _qPushButton->installEventFilter( this );
-    _qPushButton->setAutoDefault( true );
-
-    YPushButton::setLabel( toUTF8 ( _qPushButton->text() ) );
 }
 
 
@@ -110,8 +106,7 @@ YQGenericButton::dialog()
 
 void YQGenericButton::setEnabled( bool enabled )
 {
-    if ( _qPushButton )
-	_qPushButton->setEnabled( enabled );
+    QPushButton::setEnabled( enabled );
 
     YWidget::setEnabled( enabled );
 }
@@ -119,23 +114,17 @@ void YQGenericButton::setEnabled( bool enabled )
 
 bool YQGenericButton::isEnabled() const
 {
-    return _qPushButton ? _qPushButton->isEnabled() : false;
+    return QPushButton::isEnabled();
 }
 
 
 void YQGenericButton::setIcon( const std::string & iconName )
 {
-    if ( ! _qPushButton )
-    {
-	yuiError() << "NULL button (icon " << iconName << ")" << std::endl;
-	return;
-    }
-
-    QString qIconName = fromUTF8( iconName );
+   QString qIconName = fromUTF8( iconName );
 
     if ( qIconName.isEmpty() )
     {
-	_qPushButton->setIcon( QIcon() );
+	QPushButton::setIcon( QIcon() );
 	return;
     }
 
@@ -146,103 +135,88 @@ void YQGenericButton::setIcon( const std::string & iconName )
     if ( icon.isNull() )
 	yuiWarning() << "Can't load icon \"" << qIconName << "\"" << std::endl;
     else
-	_qPushButton->setIcon( icon );
+	QPushButton::setIcon( icon );
 }
 
 
 void YQGenericButton::setLabel( const QString & label )
 {
-    if ( _qPushButton )
-	_qPushButton->setText( label );
-    else
-	yuiError() << "NULL button \"" << label << "\"" << std::endl;
-
-    YPushButton::setLabel( toUTF8( label ) );
+  QPushButton::setText( label );
+  YPushButton::setLabel( toUTF8( label ) );
 }
 
 
 void YQGenericButton::setLabel( const std::string & label )
 {
-    if ( _qPushButton )
-	_qPushButton->setText( fromUTF8( label ) );
-    else
-	yuiError() << "NULL button \"" << label << "\"" << std::endl;
-
-    YPushButton::setLabel( label );
+  QPushButton::setText( fromUTF8( label ) );
+  YPushButton::setLabel( label );
 }
 
 
 void YQGenericButton::showAsDefault( bool show )
 {
-    if ( _qPushButton )
-    {
-        _qPushButton->setAutoDefault( !show );
-	_qPushButton->setDefault( show );
-	_qPushButton->update();
-    }
+  QPushButton::setAutoDefault( !show );
+  QPushButton::setDefault( show );
+  QPushButton::update();
 }
 
 
 bool YQGenericButton::isShownAsDefault() const
 {
-    return _qPushButton ? _qPushButton->isDefault() : false;
+  return QPushButton::isDefault();
 }
 
 
 QString
 YQGenericButton::text() const
 {
-    return _qPushButton ? _qPushButton->text() : "";
+    return QPushButton::text();
 }
 
 
 void YQGenericButton::activate()
 {
-    if ( _qPushButton )
-	_qPushButton->animateClick();
+  QPushButton::animateClick();
 }
 
 
 bool YQGenericButton::eventFilter( QObject * obj, QEvent * event )
 {
-    if ( event )
-    {
-	if ( event->type() == QEvent::FocusIn )
-	{
-	    dialog()->gettingFocus( this );
-	    return false;	// event processed?
-	}
-	else if ( event->type() == QEvent::FocusOut )
-	{
-	    dialog()->losingFocus( this );
-	    return false;	// event processed?
-	}
-	else if ( event->type() == QEvent::MouseButtonRelease )
-	{
-	    QMouseEvent * mouseEvent = dynamic_cast<QMouseEvent *> (event);
+  if ( event )
+  {
+      if ( event->type() == QEvent::FocusIn )
+      {
+          dialog()->gettingFocus( this );
+          return false;	// event processed?
+      }
+      else if ( event->type() == QEvent::FocusOut )
+      {
+          dialog()->losingFocus( this );
+          return false;	// event processed?
+      }
+      else if ( event->type() == QEvent::MouseButtonRelease )
+      {
+          QMouseEvent * mouseEvent = dynamic_cast<QMouseEvent *> (event);
 
-	    if ( mouseEvent && mouseEvent->button() == Qt::RightButton )
-	    {
-		yuiMilestone() << "Right click on button detected" << std::endl;
-		YQUI::yqApp()->maybeLeftHandedUser();
-	    }
-	}
-    }
+          if ( mouseEvent && mouseEvent->button() == Qt::RightButton )
+          {
+              yuiMilestone() << "Right click on button detected" << std::endl;
+              YQUI::yqApp()->maybeLeftHandedUser();
+          }
+      }
+  }
 
 
-    return QObject::eventFilter( obj, event );
+  return QObject::eventFilter( obj, event );
 }
 
 
 bool YQGenericButton::setKeyboardFocus()
 {
-    if ( ! _qPushButton )
-	return false;
+  dialog()->gettingFocus( this );
+  QPushButton::setFocus();
 
-    dialog()->gettingFocus( this );
-    _qPushButton->setFocus();
-
-    return true;
+  return true;
 }
 
 

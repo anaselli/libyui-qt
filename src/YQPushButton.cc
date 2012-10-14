@@ -34,6 +34,7 @@
 #include "YQUI.h"
 #include <yui/YEvent.h>
 #include "YQPushButton.h"
+#include "YQLayoutBox.h"
 
 
 YQPushButton::YQPushButton( YWidget *		parent,
@@ -42,28 +43,21 @@ YQPushButton::YQPushButton( YWidget *		parent,
 {
     setWidgetRep( this );
 
-    QPushButton * button = new QPushButton( fromUTF8( label ), this);
-    Q_CHECK_PTR( button );
+    // fromUTF8( label ) ?
+    YQGenericButton::setLabel(label);
 
-    setQPushButton( button );
-
-    button->setMinimumSize( 2, 2 );
-    button->move( YQButtonBorder, YQButtonBorder );
-    setMinimumSize( button->minimumSize()
-                    + 2 * QSize( YQButtonBorder, YQButtonBorder ) );
-
-    connect( button, SIGNAL( clicked() ),
-	     this,   SLOT  ( hit()     ) );
-    QWidget* pParent =(QWidget *) YWidget::parent()->widgetRep();
-    if (pParent)
-    {
-        QLayout *pLayout = pParent->layout();
-        if (pLayout)
-        {
-            pLayout->activate();            
-        }
-    }
+    connect( this, SIGNAL( clicked() ),
+            this,   SLOT  ( hit()     ) );
     
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    if (pParentLayout)
+    {
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+          pLayout->activate();            
+      }
+    }
     this->show();
 }
 
@@ -87,17 +81,18 @@ int YQPushButton::preferredHeight()
 
 void YQPushButton::setSize( int newWidth, int newHeight )
 {
-    qPushButton()->resize( newWidth  - 2 * YQButtonBorder,
+    QPushButton::resize( newWidth  - 2 * YQButtonBorder,
                            newHeight - 2 * YQButtonBorder );
     resize( newWidth, newHeight );
-    QWidget* pParent =(QWidget *) YWidget::parent()->widgetRep();
-    if (pParent)
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
+    if (pParentLayout)
     {
-        QLayout *pLayout = pParent->layout();
-        if (pLayout)
-        {
-            pLayout->activate();            
-        }
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+          pLayout->activate();        
+      }
     }
 }
 

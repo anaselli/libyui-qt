@@ -26,7 +26,7 @@
 #ifndef YQGenericButton_h
 #define YQGenericButton_h
 
-#include <qwidget.h>
+#include <qpushbutton.h>
 
 #include <yui/YPushButton.h>
 
@@ -41,7 +41,7 @@ using std::string;
  * Abstract base class for push button and similar widgets -
  * all that can become a YQDialog's "default button".
  **/
-class YQGenericButton : public QWidget, public YPushButton
+class YQGenericButton : public QPushButton, public YPushButton
 {
     friend class YQDialog;
 
@@ -121,7 +121,7 @@ public:
     /**
      * Returns the internal Qt PushButton.
      **/
-    QPushButton * qPushButton() const { return _qPushButton; }
+    const QPushButton * qPushButton() const { return this; }
 
     /**
      * Returns the internal parent dialog.
@@ -138,11 +138,6 @@ public slots:
 
 
 protected:
-
-    /**
-     * Set the corresponding QPushButton.
-     **/
-    void setQPushButton( QPushButton * pb );
 
     /**
      * Redirect events from the _qPushButton member to this object.
@@ -162,7 +157,6 @@ protected:
 private:
 
     YQDialog *		_dialog;
-    QPushButton *	_qPushButton;
 };
 
 #endif // YQGenericButton_h

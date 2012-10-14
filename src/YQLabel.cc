@@ -33,6 +33,7 @@
 #include "YQUI.h"
 #include "YQApplication.h"
 #include "YQLabel.h"
+#include "YQLayoutBox.h"
 
 
 YQLabel::YQLabel( YWidget * 		parent,
@@ -58,18 +59,20 @@ YQLabel::YQLabel( YWidget * 		parent,
         setLineWidth(2);
         setMidLineWidth(2);
     }
-
+    
     QWidget* pParent =(QWidget *) parent->widgetRep();
-    if (pParent)
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    if (pParentLayout)
     {
-        QLayout *pLayout = pParent->layout();
-        if (pLayout)
-        {
-            pLayout->addWidget(this);
-            pParent->show();
-        }
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+        pLayout->addWidget(this);
+        if (pParent)
+          pParent->show();
+      }
     }
-
+    
     setMargin( YQWidgetMargin );
     setAlignment( Qt::AlignLeft | Qt::AlignTop );
 }
@@ -120,14 +123,14 @@ int YQLabel::preferredHeight()
 void YQLabel::setSize( int newWidth, int newHeight )
 {
     resize( newWidth, newHeight );
-    QWidget* pParent =(QWidget *) YWidget::parent()->widgetRep();
-    if (pParent)
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
+    if (pParentLayout)
     {
-        QLayout *pLayout = pParent->layout();
-        if (pLayout)
-        {
-            pLayout->activate();            
-        }
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+         pLayout->activate();            
+      }
     }
 }
 

@@ -33,6 +33,7 @@
 using std::max;
 
 #include "YQFrame.h"
+#include "YQLayoutBox.h"
 
 
 YQFrame::YQFrame( YWidget * 		parent,
@@ -40,19 +41,23 @@ YQFrame::YQFrame( YWidget * 		parent,
     : QGroupBox( (QWidget *) parent->widgetRep() )
     , YFrame( parent, initialLabel )
 {
-    setWidgetRep ( this );
-    QGroupBox::setTitle( fromUTF8( label() ) );
+  setWidgetRep ( this );
+  QGroupBox::setTitle( fromUTF8( label() ) );
 
-    QWidget* pParent =(QWidget *) parent->widgetRep();
-    if (pParent)
+
+  QWidget* pParent =(QWidget *) parent->widgetRep();
+
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
     {
-      QLayout *pLayout = pParent->layout();
-      if (pLayout)
-      {
-         pLayout->addWidget(this);
-         pParent->show();
-      }
+      pLayout->addWidget(this);
+      if ( pParent )
+      pParent->show();
     }
+  }
 }
 
 
@@ -72,34 +77,27 @@ void YQFrame::setEnabled( bool enabled )
 void
 YQFrame::setSize( int newWidth, int newHeight )
 {
-    resize( newWidth, newHeight );
+  resize ( newWidth, newHeight );
 
-    if ( hasChildren() )
-    {
-        int left, top, right, bottom;
-        getContentsMargins( &left, &top, &right, &bottom );
-        int newChildWidth  = newWidth - left - right;
-        int newChildHeight = newHeight - bottom - top;
+  if ( hasChildren() )
+  {
+    int left, top, right, bottom;
+    getContentsMargins ( &left, &top, &right, &bottom );
+    int newChildWidth  = newWidth - left - right;
+    int newChildHeight = newHeight - bottom - top;
 
-        firstChild()->setSize( newChildWidth, newChildHeight );
+    firstChild()->setSize ( newChildWidth, newChildHeight );
 
-        QWidget * qChild = (QWidget *) firstChild()->widgetRep();
-        qChild->move( left, top );
-    }
-    QLayout *pLayout = layout();
-    if (pLayout)
-    {
-      pLayout->activate();
-    }
-    QWidget* pParent =(QWidget *) YWidget::parent()->widgetRep();
-    if (pParent)
-    {
-        pLayout = pParent->layout();
-        if (pLayout)
-        {
-            pLayout->activate();            
-        }
-    }
+    QWidget * qw = dynamic_cast<QWidget*> ( firstChild() );
+    if ( qw )
+      qw->move ( left, top );
+
+  }
+  QLayout *pLayout = layout();
+  if ( pLayout )
+  {
+    pLayout->activate();
+  }
 }
 
 

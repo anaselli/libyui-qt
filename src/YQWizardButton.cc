@@ -40,13 +40,13 @@ YQWizardButton::YQWizardButton( YQWizard *	wizard,
     : YQGenericButton( wizard, label )
     , _wizard( wizard )
 {
-    QPushButton * button = new QPushButton( fromUTF8( label ), buttonParent );
-    Q_CHECK_PTR( button );
+    //fromUTF8( label )?
+    YQGenericButton::setLabel(label);
+    setWidgetRep(this);
 
-    setQPushButton( button );
-    setWidgetRep( button );
-
-    connect( button, SIGNAL( clicked() ),
+    QPushButton::setParent(buttonParent);
+    
+     connect( this, SIGNAL( clicked() ),
 	     this,   SIGNAL( clicked() ) );
 
 
@@ -65,24 +65,19 @@ YQWizardButton::~YQWizardButton()
 
 void YQWizardButton::hide()
 {
-    if ( qPushButton() )
-	qPushButton()->hide();
+  QPushButton::hide();
 }
 
 
 void YQWizardButton::show()
 {
-    if ( qPushButton() )
-	qPushButton()->show();
+  QPushButton::show();
 }
 
 
 bool YQWizardButton::isShown() const
 {
-    if ( qPushButton() )
-	return !qPushButton()->isHidden();
-    else
-	return false;
+  return !QPushButton::isHidden();
 }
 
 

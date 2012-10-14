@@ -26,14 +26,16 @@
 #ifndef YQLayoutBox_h
 #define YQLayoutBox_h
 
+#include <QLayout>
 #include <qwidget.h>
 
 #include <yui/YLayoutBox.h>
 
 
-class YQLayoutBox : public QWidget, public YLayoutBox
+class YQLayoutBox : public YLayoutBox
 {
-    Q_OBJECT
+//     Q_OBJECT
+    QLayout *_pLayout;
 
 public:
 
@@ -69,6 +71,12 @@ public:
      * Reimplemented from YLayoutBox.
      **/
     virtual void moveChild( YWidget * child, int newX, int newY );
+    
+    /**
+     * Return QLayout needed to add sub-layouts.
+     *
+     **/
+    virtual QLayout* layout();
 };
 
 

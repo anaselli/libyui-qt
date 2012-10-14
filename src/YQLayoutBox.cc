@@ -29,73 +29,123 @@
 #include <yui/YUILog.h>
 #include "YQLayoutBox.h"
 
+#include <QtDebug>
 
-YQLayoutBox::YQLayoutBox( YWidget * 	parent,
-			  YUIDimension	dimension )
-    : QWidget( (QWidget *) parent->widgetRep() )
-    , YLayoutBox( parent, dimension )
+
+YQLayoutBox::YQLayoutBox( YWidget* parent,
+                          YUIDimension  dimension )
+    : YLayoutBox( parent, dimension ), _pLayout(0)
 {
-    setWidgetRep( this );
-    if (dimension == YD_VERT)
+  QWidget* pParent = (QWidget *) parent->widgetRep();
+  
+  if (dimension == YD_VERT)
+  {
+    _pLayout = new QVBoxLayout;
+  }
+  else
+  {
+    _pLayout = new QHBoxLayout;
+  }
+  
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+  if (pParentLayout)
+  {
+    QLayout* pLayout= pParentLayout->layout();
+    // parent is itself a layout it should have been already added to parent widget
+    QVBoxLayout *pVBoxLayout = dynamic_cast<QVBoxLayout*>(pLayout);
+    if (pVBoxLayout)
     {
-       QVBoxLayout *layout = new QVBoxLayout;
-       QWidget::setLayout(layout);
+      pVBoxLayout->addLayout(_pLayout);
     }
     else
     {
-       QHBoxLayout *layout = new QHBoxLayout;
-       QWidget::setLayout(layout);
+      QHBoxLayout *pHBoxLayout = dynamic_cast<QHBoxLayout*>(pLayout);
+      if (pHBoxLayout)
+      {
+        pHBoxLayout->addLayout(_pLayout);
+      }
     }
-    QWidget* pParent =(QWidget *) parent->widgetRep();
     if (pParent)
     {
-       QLayout *pLayout = pParent->layout();
-       if (pLayout)
-       {
-          pLayout->addWidget(this);
-          pParent->show();
-       }
+      // just to assign a QWidget it shouldn't be needed
+      setWidgetRep(pParent);
+      pParent->show();
     }
-    this->show();
+    _pLayout->activate();
+    
+  }
+  else
+  {    
+    if (pParent)
+    {
+      std::cout << "pParent " << parent << " setLayout(_pLayout)" << this << std::endl;
+      // this is not a QWidget
+      setWidgetRep(pParent);
+      pParent->setLayout(_pLayout);
+      _pLayout->activate();
+      pParent->show();
+    }
+  }
 }
 
 
 YQLayoutBox::~YQLayoutBox()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent());
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
+    {
+      pLayout->removeItem(_pLayout);
+    }
+  }
+
+  delete _pLayout;
 }
 
 
 void YQLayoutBox::setEnabled( bool enabled )
 {
-    QWidget::setEnabled( enabled );
     YWidget::setEnabled( enabled );
 }
 
 
 void YQLayoutBox::setSize( int newWidth, int newHeight )
 {
-    // yuiDebug() << "Resizing " << this << " to " << newWidth << " x " << newHeight << std::endl;
-    resize( newWidth, newHeight );
-    YLayoutBox::setSize( newWidth, newHeight );
-    QLayout *pLayout = layout();
-    if (pLayout)
-    {
-      pLayout->activate();
-    }
+  YLayoutBox::setSize( newWidth, newHeight );
+  QRect rec;
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent());
+  if (pParentLayout)
+  {
+    rec = _pLayout->geometry();
+  }
+  else
+  {
+    rec = ((QWidget *)(widgetRep()))->geometry();
+  }
+  rec.setSize(QSize(newWidth,newHeight));
+  std::cout << "setSize " << this << " w " << newWidth <<" h " << newHeight 
+            << " Rec " << rec.x() << "," << rec.y() << "," << rec.width() << "," << rec.height() << "," << std::endl;
+  _pLayout->setGeometry(rec);
+  _pLayout->update();
+  
+//   ((QWidget *)(widgetRep()))->update();
 }
 
 
 void YQLayoutBox::moveChild( YWidget * child, int newX, int newY )
-{
-    QWidget * qw = (QWidget *)( child->widgetRep() );
+{  
+  std::cout << "moveChild " << this << " child " << child <<" to (x,y) (" << newX << "," << newY <<")" << std::endl;
+
+  QWidget * qw = dynamic_cast<QWidget*>(child);
+  if (qw)
     qw->move( newX, newY );
-    QLayout *pLayout = layout();
-    if (pLayout)
-    {
-      pLayout->activate();
-    }
+  _pLayout->activate();
 }
 
+QLayout* YQLayoutBox::layout()
+{
+  return _pLayout;
+}
 
-#include "YQLayoutBox.moc"

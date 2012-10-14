@@ -26,52 +26,73 @@
 #include <QLayout>
 #include <QtGui/QSpacerItem>
 #include "YQSpacing.h"
+#include "YQLayoutBox.h"
 
 
 YQSpacing::YQSpacing( YWidget *		parent,
                       YUIDimension 	dim,
                       bool 		stretchable,
                       YLayoutSize_t 	layoutUnits )
-    : QWidget( (QWidget *) parent->widgetRep() )
-    , YSpacing( parent, dim, stretchable, layoutUnits )
+    : YSpacing( parent, dim, stretchable, layoutUnits ), _spacer(0)
 {
-    setWidgetRep( this );
+  QWidget* pParent = (QWidget *) parent->widgetRep();
+  // nearest QWidget
+  setWidgetRep ( pParent );
 
-    QWidget* pParent =(QWidget *) parent->widgetRep();
-    if (pParent)
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
     {
-        QLayout *pLayout = pParent->layout();
-        if (pLayout)
-        {
-            QSpacerItem * spacer = NULL;
 
-            //TODO fix layoutUnits
-            if (dim == YD_HORIZ)
-            {              
-              spacer = new QSpacerItem(20, 20, (stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed), QSizePolicy::Fixed);
-            }
-            else
-            {
-              spacer = new QSpacerItem(20, 20, QSizePolicy::Fixed, (stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed));
-            }
-            pLayout->addItem(spacer);
-            pParent->show();
-        }
+      //TODO fix layoutUnits
+      if ( dim == YD_HORIZ )
+      {
+        _spacer = new QSpacerItem ( 20, 20, ( stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed ), QSizePolicy::Fixed );
+      }
+      else
+      {
+        _spacer = new QSpacerItem ( 20, 20, QSizePolicy::Fixed, ( stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed ) );
+      }
+      pLayout->addItem ( _spacer );
+      if ( pParent )
+        pParent->show();
     }
+  }      
 }
 
 
 YQSpacing::~YQSpacing()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent());
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
+    {
+      pLayout->removeItem(_spacer);
+      delete _spacer;
+    }
+  }
 }
 
 
 void YQSpacing::setSize( int newWidth, int newHeight )
 {
-    resize( newWidth, newHeight );
+  if ( stretchable( YD_HORIZ ) || stretchable( YD_VERT  ) )
+  {
+    QRect rec;
+    rec.setSize(QSize(newWidth,newHeight));
+    std::cout << "setSize " << this << " w " << newWidth <<" h " << newHeight 
+            << " Rec " << rec.x() << "," << rec.y() << "," << rec.width() << "," << rec.height() << "," << std::endl;
+    _spacer->setGeometry(rec);
+  }
+//   _spacer->invalidate();
+  
+//   _spacer->changeSize(newWidth,newHeight);
+//    _spacer->invalidate();  
+//  ((QWidget *)(widgetRep()))->show();
+  
 }
 
-
-
-#include "YQSpacing.moc"
