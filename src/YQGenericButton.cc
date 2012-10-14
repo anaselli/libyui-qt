@@ -54,7 +54,7 @@ YQGenericButton::YQGenericButton( YWidget *		parent,
       QLayout *pLayout = pParentLayout->layout();
       if (pLayout)
       {
-        std::cout << "pParent " << parent << " _pLayout " << pParentLayout << std::endl;
+//         std::cout << "pParent " << parent << " _pLayout " << pParentLayout << std::endl;
 
         pLayout->addWidget(this);
         pLayout->activate();
@@ -70,14 +70,25 @@ YQGenericButton::YQGenericButton( YWidget *		parent,
 
 YQGenericButton::~YQGenericButton()
 {
-    if ( _dialog ) // If we don't have one any more, don't bother
-    {
-	if ( _dialog->focusButton() == this )
-	    _dialog->losingFocus( this );
+  if ( _dialog ) // If we don't have one any more, don't bother
+  {
+    if ( _dialog->focusButton() == this )
+      _dialog->losingFocus ( this );
 
-	if ( _dialog->defaultButton() == this )
-	    _dialog->setDefaultButton(0);
+    if ( _dialog->defaultButton() == this )
+      _dialog->setDefaultButton ( 0 );
+  }
+  
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  if ( pParentLayout )
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
+    {
+      pLayout->removeWidget( this );
+      pLayout->activate();
     }
+  }
 }
 
 

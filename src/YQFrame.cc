@@ -63,7 +63,15 @@ YQFrame::YQFrame( YWidget * 		parent,
 
 YQFrame::~YQFrame()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
+    {
+      pLayout->removeWidget(this);
+    }
+  }
 }
 
 

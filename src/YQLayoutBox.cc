@@ -78,7 +78,7 @@ YQLayoutBox::YQLayoutBox( YWidget* parent,
   {    
     if (pParent)
     {
-      std::cout << "pParent " << parent << " setLayout(_pLayout)" << this << std::endl;
+//       std::cout << "pParent " << parent << " setLayout(_pLayout)" << this << std::endl;
       // this is not a QWidget
       setWidgetRep(pParent);
       pParent->setLayout(_pLayout);
@@ -125,8 +125,8 @@ void YQLayoutBox::setSize( int newWidth, int newHeight )
     rec = ((QWidget *)(widgetRep()))->geometry();
   }
   rec.setSize(QSize(newWidth,newHeight));
-  std::cout << "setSize " << this << " w " << newWidth <<" h " << newHeight 
-            << " Rec " << rec.x() << "," << rec.y() << "," << rec.width() << "," << rec.height() << "," << std::endl;
+//   std::cout << "setSize " << this << " w " << newWidth <<" h " << newHeight 
+//             << " Rec " << rec.x() << "," << rec.y() << "," << rec.width() << "," << rec.height() << "," << std::endl;
   _pLayout->setGeometry(rec);
   _pLayout->update();
   
@@ -136,7 +136,7 @@ void YQLayoutBox::setSize( int newWidth, int newHeight )
 
 void YQLayoutBox::moveChild( YWidget * child, int newX, int newY )
 {  
-  std::cout << "moveChild " << this << " child " << child <<" to (x,y) (" << newX << "," << newY <<")" << std::endl;
+//   std::cout << "moveChild " << this << " child " << child <<" to (x,y) (" << newX << "," << newY <<")" << std::endl;
 
   QWidget * qw = dynamic_cast<QWidget*>(child);
   if (qw)

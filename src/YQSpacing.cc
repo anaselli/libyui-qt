@@ -84,8 +84,8 @@ void YQSpacing::setSize( int newWidth, int newHeight )
   {
     QRect rec;
     rec.setSize(QSize(newWidth,newHeight));
-    std::cout << "setSize " << this << " w " << newWidth <<" h " << newHeight 
-            << " Rec " << rec.x() << "," << rec.y() << "," << rec.width() << "," << rec.height() << "," << std::endl;
+//     std::cout << "setSize " << this << " w " << newWidth <<" h " << newHeight 
+//             << " Rec " << rec.x() << "," << rec.y() << "," << rec.width() << "," << rec.height() << "," << std::endl;
     _spacer->setGeometry(rec);
   }
 //   _spacer->invalidate();
