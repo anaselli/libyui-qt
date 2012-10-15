@@ -40,40 +40,46 @@ YQSpacing::YQSpacing( YWidget *		parent,
   setWidgetRep ( pParent );
 
   YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+  QLayout *pLayout = NULL;
   if (pParentLayout)
+    pLayout = pParentLayout->layout();
+  else if (pParent)
+    pLayout = pParent->layout();
+    
+  if ( pLayout )
   {
-    QLayout *pLayout = pParentLayout->layout();
-    if ( pLayout )
+    //TODO fix layoutUnits
+    if ( dim == YD_HORIZ )
     {
-
-      //TODO fix layoutUnits
-      if ( dim == YD_HORIZ )
-      {
-        _spacer = new QSpacerItem ( 20, 20, ( stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed ), QSizePolicy::Fixed );
-      }
-      else
-      {
-        _spacer = new QSpacerItem ( 20, 20, QSizePolicy::Fixed, ( stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed ) );
-      }
-      pLayout->addItem ( _spacer );
-      if ( pParent )
-        pParent->show();
+      _spacer = new QSpacerItem ( 20, 20, ( stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed ), QSizePolicy::Fixed );
     }
-  }      
+    else
+    {
+      _spacer = new QSpacerItem ( 20, 20, QSizePolicy::Fixed, ( stretchable ? QSizePolicy::Expanding : QSizePolicy::Fixed ) );
+    }
+    pLayout->addItem ( _spacer );
+    if ( pParent )
+      pParent->show();
+  }
+        
 }
 
 
 YQSpacing::~YQSpacing()
 {
+  QWidget* pParent = (QWidget *) parent()->widgetRep();
   YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent());
+  QLayout *pLayout = NULL;
   if (pParentLayout)
+    pLayout = pParentLayout->layout();
+  else if (pParent)
+    pLayout = pParent->layout();
+  
+  if (pLayout)
   {
-    QLayout *pLayout = pParentLayout->layout();
-    if ( pLayout )
-    {
-      pLayout->removeItem(_spacer);
-      delete _spacer;
-    }
+    pLayout->removeItem(_spacer);
+//deleteChildren() crashes here using perl :/
+    delete _spacer;
   }
 }
 

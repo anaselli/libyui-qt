@@ -58,6 +58,14 @@ YQFrame::YQFrame( YWidget * 		parent,
       pParent->show();
     }
   }
+  else
+  {
+    if (pParent && pParent->layout())
+    {
+      pParent->layout()->addWidget(this);
+    }
+  }
+
 }
 
 
@@ -71,6 +79,12 @@ YQFrame::~YQFrame()
     {
       pLayout->removeWidget(this);
     }
+  }
+  else
+  {
+    QWidget* pParent =(QWidget *)  YWidget::parent()->widgetRep();
+    if (pParent && pParent->layout())
+      pParent->layout()->removeWidget(this);
   }
 }
 

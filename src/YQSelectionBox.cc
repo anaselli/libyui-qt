@@ -43,6 +43,7 @@ using std::max;
 #include "YQDialog.h"
 #include <yui/YUIException.h>
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 
 #define VERBOSE_SELECTION		1
 
@@ -76,7 +77,25 @@ YQSelectionBox::YQSelectionBox( YWidget * parent, const std::string & label )
 						QSizePolicy::Expanding ) );
     //FIXME _qt_listWidget->setTopItem(0);
     _caption->setBuddy( _qt_listWidget );
-
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    if (pParentLayout)
+    {
+      QLayout *pLayout = pParentLayout->layout();
+      if ( pLayout )
+      {
+        pLayout->addWidget(this);
+      }
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent && pParent->layout())
+      {
+        pParent->layout()->addWidget(this);
+      }
+    }
+ 
     connect( _qt_listWidget,	SIGNAL( itemSelectionChanged() ),
 	     this,		SLOT  ( slotSelectionChanged() ) );
 
@@ -90,7 +109,21 @@ YQSelectionBox::YQSelectionBox( YWidget * parent, const std::string & label )
 
 YQSelectionBox::~YQSelectionBox()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if ( pLayout )
+    {
+      pLayout->removeWidget(this);
+    }    
+  }  
+  else
+  {
+     QWidget* pParent =(QWidget *)  YWidget::parent()->widgetRep();
+     if (pParent && pParent->layout())
+      pParent->layout()->removeWidget(this);
+  }
 }
 
 

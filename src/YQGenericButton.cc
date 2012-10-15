@@ -48,6 +48,7 @@ YQGenericButton::YQGenericButton( YWidget *		parent,
     , _dialog( 0 )
 {
     setWidgetRep( 0 );
+    QWidget* pParent =(QWidget *) parent->widgetRep();
     YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
     if (pParentLayout)
     {
@@ -60,7 +61,14 @@ YQGenericButton::YQGenericButton( YWidget *		parent,
         pLayout->activate();
       }
     }
-    QWidget* pParent =(QWidget *) parent->widgetRep();
+    else
+    {
+      if (pParent && pParent->layout())
+      {
+        pParent->layout()->addWidget(this);
+      }
+    }
+    
     if (pParent)
     {
       pParent->update();
@@ -88,6 +96,12 @@ YQGenericButton::~YQGenericButton()
       pLayout->removeWidget( this );
       pLayout->activate();
     }
+  }
+  else
+  {
+     QWidget* pParent =(QWidget *)  YWidget::parent()->widgetRep();
+     if (pParent && pParent->layout())
+      pParent->layout()->removeWidget(this);
   }
 }
 

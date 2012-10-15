@@ -58,6 +58,7 @@ public:
 		 YAlignmentType 	horAlign,
 		 YAlignmentType 	vertAlign );
 
+  virtual ~YQAlignment();
     /**
      * Move the child widget to a new position.
      *

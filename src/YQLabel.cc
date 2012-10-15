@@ -72,6 +72,13 @@ YQLabel::YQLabel( YWidget * 		parent,
           pParent->show();
       }
     }
+    else
+    {
+      if (pParent && pParent->layout())
+      {
+        pParent->layout()->addWidget(this);
+      }
+    }
     
     setMargin( YQWidgetMargin );
     setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -80,7 +87,21 @@ YQLabel::YQLabel( YWidget * 		parent,
 
 YQLabel::~YQLabel()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if (pLayout)
+    {
+      pLayout->removeWidget(this);
+    }
+  }
+  else
+  {
+     QWidget* pParent =(QWidget *)  YWidget::parent()->widgetRep();
+     if (pParent && pParent->layout())
+      pParent->layout()->removeWidget(this);
+  }
 }
 
 

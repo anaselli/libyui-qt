@@ -27,6 +27,7 @@
 #include <yui/YUILog.h>
 #include <qpixmap.h>
 #include "YQAlignment.h"
+#include "YQLayoutBox.h"
 
 using std::string;
 
@@ -38,6 +39,34 @@ YQAlignment::YQAlignment( YWidget *	  	parent,
     , YAlignment( parent, horAlign, vertAlign )
 {
     setWidgetRep( this );
+        QGridLayout *layout = new QGridLayout();
+    setLayout( layout );
+
+    Qt::Alignment align = 0;
+    if (horAlign == YAlignBegin)
+      align |= Qt::AlignLeft;
+    else if (horAlign == YAlignEnd)
+      align |= Qt::AlignRight;
+    else if (horAlign == YAlignCenter)
+      align |= Qt::AlignHCenter;
+
+    if (vertAlign == YAlignBegin)
+      align |= Qt::AlignTop;
+    else if (vertAlign == YAlignEnd)
+      align |= Qt::AlignBottom;
+    else if (vertAlign == YAlignCenter)
+      align |= Qt::AlignVCenter;
+  
+    layout->setAlignment(align);
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    if (pParentLayout)
+    {
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+        pLayout->addWidget(this);
+      }
+    }
 }
 
 
@@ -49,8 +78,50 @@ YQAlignment::YQAlignment( YWidget *	  	yParent,
     , YAlignment( yParent, horAlign, vertAlign )
 {
     setWidgetRep( this );
+    
+    QGridLayout *layout = new QGridLayout();
+    setLayout( layout );
+
+    Qt::Alignment align = 0;
+    if (horAlign == YAlignBegin)
+      align |= Qt::AlignLeft;
+    else if (horAlign == YAlignEnd)
+      align |= Qt::AlignRight;
+    else if (horAlign == YAlignCenter)
+      align |= Qt::AlignHCenter;
+
+    if (vertAlign == YAlignBegin)
+      align |= Qt::AlignTop;
+    else if (vertAlign == YAlignEnd)
+      align |= Qt::AlignBottom;
+    else if (vertAlign == YAlignCenter)
+      align |= Qt::AlignVCenter;
+  
+    layout->setAlignment(align);
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(yParent);
+    if (pParentLayout)
+    {
+      QLayout *pLayout = pParentLayout->layout();
+      if (pLayout)
+      {
+        pLayout->addWidget(this);
+      }
+    }
 }
 
+YQAlignment::~YQAlignment()
+{
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
+  if (pParentLayout)
+  {
+    QLayout *pLayout = pParentLayout->layout();
+    if (pLayout)
+    {
+      pLayout->removeWidget(this);
+    }
+  }
+}
 
 void YQAlignment::setEnabled( bool enabled )
 {
