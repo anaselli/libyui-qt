@@ -103,7 +103,23 @@ YQPartitionSplitter::YQPartitionSplitter( YWidget *		parent,
     YUI_CHECK_PTR( _newPartField );
     _newPartField->setStretchable( YD_HORIZ, false );
 
-
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
     // Connect signals
 
     connect( _newPartField,	SIGNAL( valueChanged      (int) ),
@@ -116,8 +132,23 @@ YQPartitionSplitter::YQPartitionSplitter( YWidget *		parent,
 
 YQPartitionSplitter::~YQPartitionSplitter()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void YQPartitionSplitter::setEnabled( bool enabled )

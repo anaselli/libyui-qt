@@ -52,6 +52,10 @@ public:
 		  bool			passwordMode = false );
 
     /**
+     * Destructor.
+     **/
+    virtual ~YQInputField();
+    /**
      * Get the current value (the text entered by the user or set from the
      * outside) of this input field.
      *

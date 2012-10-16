@@ -34,6 +34,7 @@
 #include "YQIntField.h"
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 #include <QVBoxLayout>
 
 YQIntField::YQIntField( YWidget *	parent,
@@ -72,12 +73,46 @@ YQIntField::YQIntField( YWidget *	parent,
 
     connect( _qt_spinBox, SIGNAL( valueChanged    ( int ) ),
 	     this,  	  SLOT  ( valueChangedSlot( int ) ) );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQIntField::~YQIntField()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }
 }
 
 

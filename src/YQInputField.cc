@@ -39,6 +39,7 @@ using std::max;
 #include "YQi18n.h"
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 #include <QVBoxLayout>
 
 // Include low-level X headers AFTER Qt headers:
@@ -77,6 +78,24 @@ YQInputField::YQInputField( YWidget * 		parent,
     layout->addWidget( _qt_lineEdit );
 
     _caption->setBuddy( _qt_lineEdit );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
     connect( _qt_lineEdit, SIGNAL( textChanged( const QString & ) ),
 	     this,         SLOT  ( changed    ( const QString & ) ) );
@@ -93,6 +112,26 @@ YQInputField::YQInputField( YWidget * 		parent,
     }
 }
 
+YQInputField::~YQInputField()
+{
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }
+}
 
 string YQInputField::value()
 {

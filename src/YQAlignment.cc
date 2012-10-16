@@ -59,13 +59,21 @@ YQAlignment::YQAlignment( YWidget *	  	parent,
   
     layout->setAlignment(align);
     YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
     if (pParentLayout)
     {
-      QLayout *pLayout = pParentLayout->layout();
-      if (pLayout)
-      {
-        pLayout->addWidget(this);
-      }
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
     }
 }
 
