@@ -168,11 +168,47 @@ YQWizard::YQWizard( YWidget *		parent,
         YQMainWinDock::mainWinDock()->resizeVisibleChild();
     }
 
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
+
 }
 
 
 YQWizard::~YQWizard()
 {
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+    QLayout *pLayout = NULL;
+    if ( pParentLayout )
+    {
+      pLayout = pParentLayout ->layout();
+    }
+    else
+    {
+      QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+      if ( pParent )
+        pLayout = pParent->layout();
+    }
+
+    if ( pLayout )
+    {
+      pLayout->removeWidget ( this );
+    }
+  
     deleteSteps();
     if ( this == main_wizard )
     {

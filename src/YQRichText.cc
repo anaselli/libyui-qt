@@ -39,6 +39,7 @@
 #include "YQUI.h"
 #include "YQDialog.h"
 #include "YQRichText.h"
+#include "YQLayoutBox.h"
 
 static const char *colors[] = { "red", "blue", "green", 0};
 
@@ -82,6 +83,24 @@ YQRichText::YQRichText( YWidget * parent, const std::string & text, bool plainTe
     }
 
     setValue( text );
+        
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
     // Propagate clicks on hyperlinks
 
@@ -92,8 +111,23 @@ YQRichText::YQRichText( YWidget * parent, const std::string & text, bool plainTe
 
 YQRichText::~YQRichText()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void YQRichText::setValue( const std::string & newText )

@@ -44,6 +44,7 @@ public:
 		   const std::string &	label,
 		   bool 		checked );
 
+    virtual ~YQRadioButton();
     /**
      * Return the "checked" state of the RadioButton.
      *

@@ -36,6 +36,7 @@
 using std::max;
 
 #include "YQCheckBoxFrame.h"
+#include "YQLayoutBox.h"
 
 #define TOP_MARGIN 6
 
@@ -51,10 +52,48 @@ YQCheckBoxFrame::YQCheckBoxFrame( YWidget * 		parent,
     QGroupBox::setCheckable( true );
     setValue( checked );
 
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
+    
     connect( this, SIGNAL( toggled     ( bool ) ),
              this, SLOT  ( stateChanged( bool ) ) );
 }
 
+YQCheckBoxFrame::~YQCheckBoxFrame()
+{
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }
+}
 
 void YQCheckBoxFrame::setLabel( const std::string & newLabel )
 {

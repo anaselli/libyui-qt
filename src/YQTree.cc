@@ -43,6 +43,7 @@ using std::max;
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
 #include "YQApplication.h"
+#include "YQLayoutBox.h"
 
 
 #define VERBOSE_TREE_ITEMS	0
@@ -79,6 +80,24 @@ YQTree::YQTree( YWidget * parent, const std::string & label, bool multiSelection
 	_qt_treeWidget->setContextMenuPolicy( Qt::CustomContextMenu );
 
     _caption->setBuddy ( _qt_treeWidget );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
     connect( _qt_treeWidget,	SIGNAL( itemSelectionChanged () ),
 	     this,		SLOT  ( slotSelectionChanged () ) );
@@ -109,8 +128,23 @@ YQTree::YQTree( YWidget * parent, const std::string & label, bool multiSelection
 
 YQTree::~YQTree()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void YQTree::setLabel( const std::string & label )

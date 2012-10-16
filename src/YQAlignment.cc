@@ -108,26 +108,41 @@ YQAlignment::YQAlignment( YWidget *	  	yParent,
     layout->setAlignment(align);
     
     YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(yParent);
+    QLayout *pLayout = NULL;
     if (pParentLayout)
     {
-      QLayout *pLayout = pParentLayout->layout();
-      if (pLayout)
-      {
-        pLayout->addWidget(this);
-      }
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      if (qParent)
+        pLayout = qParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
     }
 }
 
 YQAlignment::~YQAlignment()
 {
-  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(YWidget::parent());
-  if (pParentLayout)
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
   {
-    QLayout *pLayout = pParentLayout->layout();
-    if (pLayout)
-    {
-      pLayout->removeWidget(this);
-    }
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
   }
 }
 

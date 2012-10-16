@@ -33,6 +33,7 @@
 #include "utf8.h"
 #include "YQUI.h"
 #include "YQBarGraph.h"
+#include "YQLayoutBox.h"
 
 
 #define YQBarGraphOuterMargin		YQWidgetMargin
@@ -55,13 +56,45 @@ YQBarGraph::YQBarGraph( YWidget * parent )
     , YBarGraph( parent )
 {
     setWidgetRep( this );
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQBarGraph::~YQBarGraph()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void

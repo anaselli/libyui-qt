@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QHeaderView>
 #include <QMouseEvent>
+#include <QLayout>
 #include "QY2ListView.h"
 
 #define YUILogComponent "qt-pkg"
@@ -55,7 +56,14 @@ QY2ListView::QY2ListView( QWidget * parent )
 	header()->installEventFilter( this );
 	header()->setStretchLastSection( false );
     }
-
+    
+    QLayout *pLayout = NULL;
+    if (parent)
+        pLayout = parent->layout();
+    
+    if (pLayout)
+      pLayout->addWidget(this);
+    
     connect( header(),	SIGNAL( sectionResized     ( int, int, int ) ),
 	     this,	SLOT  ( columnWidthChanged ( int, int, int ) ) );
 
@@ -74,6 +82,13 @@ QY2ListView::~QY2ListView()
     if ( _toolTip )
 	delete _toolTip;
 #endif
+  QLayout *pLayout = NULL;
+  QWidget* pParent = dynamic_cast<QWidget*>(QWidget::parent());
+  if ( pParent )
+    pLayout = pParent->layout();
+
+  if ( pLayout )
+    pLayout->removeWidget ( this );
 }
 
 

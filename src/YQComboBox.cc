@@ -40,6 +40,7 @@
 #include "YQComboBox.h"
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 #include <QVBoxLayout>
 #include <QDebug>
 
@@ -67,6 +68,24 @@ YQComboBox::YQComboBox( YWidget * 	parent,
     layout->addWidget( _qt_comboBox );
 
     _caption->setBuddy( _qt_comboBox );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
 #if SEND_SELECTION_CHANGED_EVENT
     connect( _qt_comboBox,	SIGNAL( highlighted (int) ),
@@ -83,8 +102,23 @@ YQComboBox::YQComboBox( YWidget * 	parent,
 
 YQComboBox::~YQComboBox()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 string YQComboBox::text()

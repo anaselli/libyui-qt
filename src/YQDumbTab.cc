@@ -36,6 +36,7 @@
 #include "YQUI.h"
 #include "YQDumbTab.h"
 #include "YQAlignment.h"
+#include "YQLayoutBox.h"
 #include <yui/YEvent.h>
 
 #define YQDumbTabSpacing	2
@@ -58,7 +59,25 @@ YQDumbTab::YQDumbTab( YWidget *	parent )
     _tabBar->setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred ) ); // hor/vert
     setFocusProxy( _tabBar );
     setFocusPolicy( Qt::TabFocus );
-
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
+    
     connect( _tabBar, SIGNAL( selected    ( int ) ),
 	     this,    SLOT  ( slotSelected( int ) ) );
 }
@@ -66,8 +85,23 @@ YQDumbTab::YQDumbTab( YWidget *	parent )
 
 YQDumbTab::~YQDumbTab()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void

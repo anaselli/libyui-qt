@@ -32,6 +32,7 @@
 #include <QDebug>
 #include "YQUI.h"
 #include "YQMultiProgressMeter.h"
+#include "YQLayoutBox.h"
 #include <yui/YDialog.h>
 
 
@@ -44,13 +45,46 @@ YQMultiProgressMeter::YQMultiProgressMeter( YWidget *			parent,
 {
     init();
     setWidgetRep( this );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQMultiProgressMeter::~YQMultiProgressMeter()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void YQMultiProgressMeter::init()

@@ -32,6 +32,7 @@
 #include "YQUI.h"
 #include "YQDownloadProgress.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 #include <QVBoxLayout>
 #include <QProgressBar>
 
@@ -67,13 +68,45 @@ YQDownloadProgress::YQDownloadProgress( YWidget *	parent,
 
     _timer->setSingleShot(false);
     _timer->start( 250 );// millisec
+        YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQDownloadProgress::~YQDownloadProgress()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void

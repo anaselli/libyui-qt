@@ -33,6 +33,7 @@
 #include "YQUI.h"
 #include <yui/YEvent.h>
 #include "YQCheckBox.h"
+#include "YQLayoutBox.h"
 
 
 #define SPACING 8
@@ -47,6 +48,24 @@ YQCheckBox::YQCheckBox( YWidget *	parent,
     setWidgetRep( this );
 
     QCheckBox::setChecked( checked );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
     connect( this, 	SIGNAL( stateChanged( int ) ),
 	     this, 		SLOT  ( stateChanged( int ) ) );
@@ -55,8 +74,23 @@ YQCheckBox::YQCheckBox( YWidget *	parent,
 
 YQCheckBox::~YQCheckBox()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 YCheckBoxState

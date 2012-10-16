@@ -29,6 +29,7 @@
 
 #include "YQRadioButtonGroup.h"
 #include "YQRadioButton.h"
+#include "YQLayoutBox.h"
 #include "qstring.h"
 
 
@@ -37,12 +38,46 @@ YQRadioButtonGroup::YQRadioButtonGroup( YWidget * parent )
     , YRadioButtonGroup( parent )
 {
     setWidgetRep( this );
+     
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQRadioButtonGroup::~YQRadioButtonGroup()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }  
 }
 
 

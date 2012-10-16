@@ -137,7 +137,7 @@ class BusyBar : public QFrame
 public:
     BusyBar(QWidget * parent);
 
-
+    virtual ~BusyBar();
     /**
      * start moving bar animation
      **/

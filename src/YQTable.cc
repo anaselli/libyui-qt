@@ -37,6 +37,7 @@
 #include "QY2ListView.h"
 #include "YQTable.h"
 #include "YQApplication.h"
+#include "YQLayoutBox.h"
 
 
 
@@ -80,7 +81,24 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
     _qt_listView->header()->setResizeMode( QHeaderView::Interactive );
     _qt_listView->sortItems( 0, Qt::AscendingOrder);
 
-
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
+    
     //
     // Connect signals and slots
     //
@@ -108,8 +126,23 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
 
 YQTable::~YQTable()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void

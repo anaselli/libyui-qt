@@ -43,6 +43,8 @@ public:
      **/
     YQReplacePoint( YWidget * parent );
 
+    virtual ~YQReplacePoint();
+    
     /**
      * Show a newly added child.
      *

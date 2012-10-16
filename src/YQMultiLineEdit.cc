@@ -37,6 +37,7 @@ using std::max;
 #include "YQMultiLineEdit.h"
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 
 
 YQMultiLineEdit::YQMultiLineEdit( YWidget * parent, const std::string & label )
@@ -62,6 +63,24 @@ YQMultiLineEdit::YQMultiLineEdit( YWidget * parent, const std::string & label )
     _qt_textEdit->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
     _caption->setBuddy( _qt_textEdit );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
     connect( _qt_textEdit,	SIGNAL( textChanged( void ) ),
 	     this, 		SLOT  ( changed    ( void ) ) );
@@ -70,8 +89,23 @@ YQMultiLineEdit::YQMultiLineEdit( YWidget * parent, const std::string & label )
 
 YQMultiLineEdit::~YQMultiLineEdit()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 string YQMultiLineEdit::value()

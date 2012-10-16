@@ -78,13 +78,26 @@ QY2ComboTabWidget::QY2ComboTabWidget( const QString &	label,
     widget_stack = new QStackedWidget( this );
     Q_CHECK_PTR( widget_stack );
     vbox->addWidget(widget_stack);
+    
+    QLayout *pLayout = NULL;
+    if (parent)
+        pLayout = parent->layout();
+    
+    if (pLayout)
+      pLayout->addWidget(this);
 }
 
 
 
 QY2ComboTabWidget::~QY2ComboTabWidget()
 {
+  QLayout *pLayout = NULL;
+  QWidget* pParent = dynamic_cast<QWidget*>(QWidget::parent());
+  if ( pParent )
+    pLayout = pParent->layout();
 
+  if ( pLayout )
+    pLayout->removeWidget ( this );
 }
 
 

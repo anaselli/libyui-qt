@@ -36,6 +36,7 @@ using std::max;
 #include "YQUI.h"
 #include "YQProgressBar.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 
 
 YQProgressBar::YQProgressBar( YWidget * 	parent,
@@ -62,13 +63,46 @@ YQProgressBar::YQProgressBar( YWidget * 	parent,
     layout->addWidget( _qt_progressbar );
 
     _caption->setBuddy( _qt_progressbar );
+     
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQProgressBar::~YQProgressBar()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void YQProgressBar::setLabel( const std::string & label )

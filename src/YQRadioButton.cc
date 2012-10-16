@@ -36,6 +36,7 @@
 #include "YQRadioButton.h"
 #include <yui/YRadioButtonGroup.h>
 #include "YQSignalBlocker.h"
+#include "YQLayoutBox.h"
 
 using std::string;
 
@@ -65,9 +66,49 @@ YQRadioButton::YQRadioButton( YWidget * 	parent,
     setChecked( checked );
 
     installEventFilter(this);
+     
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 
     connect ( this,     SIGNAL( toggled ( bool ) ),
 	      this,	SLOT  ( changed ( bool ) ) );
+    
+}
+
+YQRadioButton::~YQRadioButton()
+{
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }
 }
 
 

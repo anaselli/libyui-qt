@@ -39,6 +39,7 @@ using std::max;
 #include "YQMultiSelectionBox.h"
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 
 #define DEFAULT_VISIBLE_LINES		5
 #define SHRINKABLE_VISIBLE_LINES	2
@@ -73,6 +74,23 @@ YQMultiSelectionBox::YQMultiSelectionBox( YWidget *		parent,
     _qt_listView->setRootIsDecorated ( false );
     _caption->setBuddy( _qt_listView );
 
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
     // Very small default size if specified
 
     connect( _qt_listView,	SIGNAL( itemSelectionChanged() 	),
@@ -88,8 +106,23 @@ YQMultiSelectionBox::YQMultiSelectionBox( YWidget *		parent,
 
 YQMultiSelectionBox::~YQMultiSelectionBox()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void

@@ -64,6 +64,22 @@ BusyBar::BusyBar(QWidget *parent)
     setFrameStyle (QFrame::Panel |  QFrame::Sunken );
     setLineWidth(2);
     setMidLineWidth(2);
+    QLayout *pLayout = NULL;
+    if (parent)
+        pLayout = parent->layout();
+    
+    if (pLayout)
+      pLayout->addWidget(this);
+}
+
+BusyBar::~BusyBar()
+{
+  QLayout *pLayout = NULL;
+  QWidget* pParent = dynamic_cast<QWidget *>(QWidget::parent());
+  if ( pParent )
+    pLayout = pParent->layout();
+  if ( pLayout )
+    pLayout->removeWidget ( this );
 }
 
 void BusyBar::update()

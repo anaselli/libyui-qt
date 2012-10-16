@@ -41,6 +41,7 @@
 #include <QToolTip>
 
 #include "icons/zoom-in.xpm"
+#include "YQLayoutBox.h"
 
 class YQTimezoneSelectorPrivate
 {
@@ -162,12 +163,47 @@ YQTimezoneSelector::YQTimezoneSelector( YWidget * parent, const std::string & pi
     connect( d->blink, SIGNAL( timeout() ), SLOT( slotBlink() ) );
 
     d->highlight = 0;
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 YQTimezoneSelector::~YQTimezoneSelector()
-{
-    delete d;
-    // NOP
+{   
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }
+  
+  delete d;
 }
 
 

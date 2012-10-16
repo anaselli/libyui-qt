@@ -25,6 +25,7 @@
 
 #define YUILogComponent "qt-ui"
 #include <yui/YUILog.h>
+#include <QLayout>
 
 #include "YQWidgetCaption.h"
 #include "utf8.h"
@@ -36,6 +37,12 @@ YQWidgetCaption::YQWidgetCaption( QWidget * parent,
 {
     setTextFormat( Qt::PlainText );
     handleVisibility( text );
+    QLayout *pLayout = NULL;
+    if (parent)
+        pLayout = parent->layout();
+    
+    if (pLayout)
+      pLayout->addWidget(this);
 }
 
 
@@ -44,12 +51,24 @@ YQWidgetCaption::YQWidgetCaption( QWidget * parent, const QString & text )
 {
     setTextFormat( Qt::PlainText );
     handleVisibility( text );
+    QLayout *pLayout = NULL;
+    if (parent)
+        pLayout = parent->layout();
+    
+    if (pLayout)
+      pLayout->addWidget(this);
 }
 
 
 YQWidgetCaption::~YQWidgetCaption()
 {
-    // NOP
+QLayout *pLayout = NULL;
+  QWidget* pParent = dynamic_cast<QWidget*>(QWidget::parent());
+  if ( pParent )
+    pLayout = pParent->layout();
+
+  if ( pLayout )
+    pLayout->removeWidget ( this );
 }
 
 

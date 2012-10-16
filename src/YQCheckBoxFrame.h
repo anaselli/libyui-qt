@@ -46,6 +46,7 @@ public:
 		     const std::string &	label,
 		     bool 		checked );
 
+    virtual ~YQCheckBoxFrame();
     /**
      * Change the label text on the CheckBoxFrame.
      *

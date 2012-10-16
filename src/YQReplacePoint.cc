@@ -28,6 +28,7 @@
 #include <yui/YUILog.h>
 
 #include "YQReplacePoint.h"
+#include "YQLayoutBox.h"
 
 
 YQReplacePoint::YQReplacePoint( YWidget * parent )
@@ -35,6 +36,44 @@ YQReplacePoint::YQReplacePoint( YWidget * parent )
     , YReplacePoint( parent )
 {
     setWidgetRep( this );
+        YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
+}
+
+YQReplacePoint::~YQReplacePoint()
+{
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }
 }
 
 

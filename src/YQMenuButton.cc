@@ -33,6 +33,7 @@
 #include "utf8.h"
 #include "YQUI.h"
 #include "YQMenuButton.h"
+#include "YQLayoutBox.h"
 #include <yui/YEvent.h>
 
 
@@ -49,13 +50,46 @@ YQMenuButton::YQMenuButton( YWidget * 		parent,
     _qt_button->move( YQButtonBorder, YQButtonBorder );
     setMinimumSize( _qt_button->minimumSize()
 		    + 2 * QSize( YQButtonBorder, YQButtonBorder ) );
+     
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQMenuButton::~YQMenuButton()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void

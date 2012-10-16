@@ -33,6 +33,7 @@
 #include "YQUI.h"
 #include "YQDateField.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 
 
 YQDateField::YQDateField( YWidget * parent, const std::string & label )
@@ -57,13 +58,46 @@ YQDateField::YQDateField( YWidget * parent, const std::string & label )
     //_qt_dateEdit->setAutoAdvance( true );
     _qt_dateEdit->setDisplayFormat( "yyyy-MM-dd" );
     _caption->setBuddy( _qt_dateEdit );
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQDateField::~YQDateField()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 string YQDateField::value()

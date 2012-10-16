@@ -36,6 +36,7 @@
 #include "YQSlider.h"
 #include "YQSignalBlocker.h"
 #include "YQWidgetCaption.h"
+#include "YQLayoutBox.h"
 
 
 YQSlider::YQSlider( YWidget *		parent,
@@ -105,7 +106,25 @@ YQSlider::YQSlider( YWidget *		parent,
     _caption->setBuddy( _qt_spinBox );
 
     setValue( initialValue );
-
+    
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
+    
     connect( _qt_spinBox, SIGNAL( valueChanged(int) ),
 	     _qt_slider,  SLOT  ( setValue    (int) ) );
 
@@ -119,7 +138,23 @@ YQSlider::YQSlider( YWidget *		parent,
 
 YQSlider::~YQSlider()
 {
-    // NOP
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }  
 }
 
 

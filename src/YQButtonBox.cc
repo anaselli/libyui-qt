@@ -26,6 +26,7 @@
 #define YUILogComponent "qt-ui"
 #include <yui/YUILog.h>
 #include "YQButtonBox.h"
+#include "YQLayoutBox.h"
 
 
 YQButtonBox::YQButtonBox( YWidget * parent )
@@ -33,13 +34,45 @@ YQButtonBox::YQButtonBox( YWidget * parent )
     , YButtonBox( parent )
 {
     setWidgetRep( this );
+    YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*>(parent);
+    QLayout *pLayout = NULL;
+    if (pParentLayout)
+    {
+      pLayout = pParentLayout->layout();
+    }
+    else
+    {
+      QWidget* pParent =(QWidget *) parent->widgetRep();
+      if (pParent)
+        pLayout = pParent->layout();
+    }
+    
+    if (pLayout)
+    {
+      pLayout->addWidget(this);
+    }
 }
 
 
 YQButtonBox::~YQButtonBox()
 {
-    // NOP
-}
+  YQLayoutBox *pParentLayout = dynamic_cast<YQLayoutBox*> ( YWidget::parent() );
+  QLayout *pLayout = NULL;
+  if ( pParentLayout )
+  {
+    pLayout = pParentLayout ->layout();
+  }
+  else
+  {
+    QWidget* pParent = ( QWidget * )  YWidget::parent()->widgetRep();
+    if ( pParent )
+      pLayout = pParent->layout();
+  }
+
+  if ( pLayout )
+  {
+    pLayout->removeWidget ( this );
+  }}
 
 
 void YQButtonBox::setEnabled( bool enabled )
