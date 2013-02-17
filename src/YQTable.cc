@@ -85,7 +85,7 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
     // Connect signals and slots
     //
 
-    connect( _qt_listView, 	SIGNAL( itemDoubleClicked ( QTreeWidgetItem *, int ) ),
+    connect( _qt_listView,      SIGNAL( itemDoubleClicked ( QTreeWidgetItem *, int ) ),
 	     this, 		SLOT  ( slotActivated	  ( QTreeWidgetItem * ) ) );
 
     connect( _qt_listView, 	SIGNAL( currentItemChanged ( QTreeWidgetItem *, QTreeWidgetItem * ) ),
@@ -93,7 +93,9 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
 
     connect( _qt_listView,      SIGNAL( customContextMenuRequested ( const QPoint & ) ),
              this,      	SLOT  ( slotContextMenu ( const QPoint & ) ) );
-
+    
+    connect( _qt_listView,      SIGNAL( columnClicked ( int , QTreeWidgetItem* , int , const QPoint &) ),
+             this,              SLOT  ( slotcolumnClicked ( int , QTreeWidgetItem* , int, const QPoint &  ) ) );
 
     if ( multiSelectionMode )
     {
@@ -408,7 +410,22 @@ YQTable::slotContextMenu ( const QPoint & pos )
 }
 
 
+void
+YQTable::slotcolumnClicked(int               button,
+                           QTreeWidgetItem * item,
+                           int               col,
+                           const QPoint &    pos)
 
+{
+  YQTableListViewItem * it = dynamic_cast<YQTableListViewItem*>(item);
+  YTableItem *pYTableItem = it->origItem();
+  YTableCell *pCell = pYTableItem->cell(col);
+  if (pCell->checkable())
+  {
+    // it seems items contains old value when signal is emitted
+    pCell->setChecked(item->checkState(col)==Qt::CheckState::Unchecked);
+  }
+}
 
 
 YQTableListViewItem::YQTableListViewItem( YQTable *	table,
@@ -450,8 +467,11 @@ YQTableListViewItem::updateCell( const YTableCell * cell )
     //
     // Set icon (if specified)
     //
-
-    if ( cell->hasIconName() )
+    if (cell->checkable() && _table->checkable(column))
+    {
+        setCheckState(column, cell->checked() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);      
+    }
+    else if ( cell->hasIconName() )
     {
 	// _table is checked against 0 in the constructor
 

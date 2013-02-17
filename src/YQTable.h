@@ -166,6 +166,10 @@ protected slots:
     void slotContextMenu ( const QPoint & pos );
 
 
+    void slotcolumnClicked(int                   button,
+                           QTreeWidgetItem *     item,
+                           int                   col,
+                           const QPoint &        pos );
 
 protected:
 
