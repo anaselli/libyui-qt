@@ -424,6 +424,8 @@ YQTable::slotcolumnClicked(int               button,
   {
     // it seems items contains old value when signal is emitted
     pCell->setChecked(item->checkState(col)==Qt::CheckState::Unchecked);
+    if ( notify() )
+        YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::ValueChanged ) );
   }
 }
 
