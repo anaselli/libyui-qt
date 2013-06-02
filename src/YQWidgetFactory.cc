@@ -197,13 +197,20 @@ YQWidgetFactory::createTree( YWidget * parent, const std::string & label, bool m
 YQTable *
 YQWidgetFactory::createTable( YWidget * parent, YTableHeader * header, bool multiSelection )
 {
-    YQTable * table = new YQTable( parent, header, multiSelection );
+    YQTable * table = new YQTable( parent, header, (multiSelection ? YTableMode::YTableMultiSelection : YTableMode::YTableSingleLineSelection) );
     YUI_CHECK_NEW( table );
 
     return table;
 }
 
+YQTable *
+YQWidgetFactory::createTable( YWidget * parent, YTableHeader * header, YTableMode mode )
+{
+    YQTable * table = new YQTable( parent, header, mode );
+    YUI_CHECK_NEW( table );
 
+    return table;
+}
 
 YQProgressBar *
 YQWidgetFactory::createProgressBar( YWidget * parent, const std::string & label, int maxValue )

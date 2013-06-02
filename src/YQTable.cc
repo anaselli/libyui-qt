@@ -38,12 +38,25 @@
 #include "YQTable.h"
 #include "YQApplication.h"
 
-
-
-YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelectionMode )
-    : QFrame( (QWidget *) parent->widgetRep() )
-    , YTable( parent, tableHeader, multiSelectionMode )
+struct YQTable::Private
 {
+  ///< offset to first YCell 
+  ///  usually 1 if checkbox Enabled and mode is YTableCheckBoxOnFirstColumn
+  ///  0 otherwise
+  unsigned int firstColumnOffset;
+
+  ///< quick way to know if YTable has checkbox enabled, instead of 
+  ///  multiselection or single selection mode
+  bool         checkboxEnabled;
+};
+
+
+YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, YTableMode selectionMode )
+    : QFrame( (QWidget *) parent->widgetRep() )
+    , YTable( parent, tableHeader, selectionMode ), _qt_listView(0), d(new Private)
+{
+    YUI_CHECK_NEW( d );
+
     setWidgetRep( this );
     QVBoxLayout* layout = new QVBoxLayout( this );
     layout->setSpacing( 0 );
@@ -59,9 +72,23 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
 
     setKeepSorting(  keepSorting() );
 
-    if ( multiSelectionMode )
-	_qt_listView->setSelectionMode( QAbstractItemView::ExtendedSelection );
+    d->firstColumnOffset = 0;
+    d->checkboxEnabled   = false;
 
+    yuiMilestone() << " Slection mode " << selectionMode <<  std::endl;
+    
+    if ( selectionMode == YTableMultiSelection )
+      _qt_listView->setSelectionMode ( QAbstractItemView::ExtendedSelection );
+    else if ( selectionMode == YTableCheckBoxOnFirstColumn )
+    {
+        d->checkboxEnabled = true;
+        d->firstColumnOffset = 1;
+    }
+    else if ( selectionMode == YTableCheckBoxOnLastColumn )
+    {
+        d->checkboxEnabled = true;
+    }
+    
     _qt_listView->setContextMenuPolicy( Qt::CustomContextMenu );
 
     //
@@ -69,17 +96,26 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
     //
 
     QStringList headers;
-    _qt_listView->setColumnCount( columns() );
+    _qt_listView->setColumnCount( columns() + (d->checkboxEnabled ? 1 : 0) );
 
+    //TODO anaselli remove next line if not needed any more
+//     _qt_listView->setSelectionBehavior(QAbstractItemView::SelectItems);
+    if ( d->firstColumnOffset == 1 )
+    {
+      headers << "";
+    }
     for ( int i=0; i < columns(); i++ )
     {
         headers << fromUTF8( header(i) );
+    }
+    if (d->checkboxEnabled && d->firstColumnOffset == 0)
+    {
+      headers << "";
     }
 
     _qt_listView->setHeaderLabels( headers );
     _qt_listView->header()->setResizeMode( QHeaderView::Interactive );
     _qt_listView->sortItems( 0, Qt::AscendingOrder);
-
 
     //
     // Connect signals and slots
@@ -96,8 +132,8 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
     
     connect( _qt_listView,      SIGNAL( columnClicked ( int , QTreeWidgetItem* , int , const QPoint &) ),
              this,              SLOT  ( slotcolumnClicked ( int , QTreeWidgetItem* , int, const QPoint &  ) ) );
-
-    if ( multiSelectionMode )
+    
+    if ( selectionMode == YTableMultiSelection )
     {
 	// This is the exceptional case - avoid performance drop in the normal case
 
@@ -110,8 +146,30 @@ YQTable::YQTable( YWidget * parent, YTableHeader * tableHeader, bool multiSelect
 
 YQTable::~YQTable()
 {
-    // NOP
+    if (d)
+      delete d;
 }
+
+bool YQTable::hasCheckboxItems()
+{
+  return d->checkboxEnabled;
+}
+
+int YQTable::checkboxItemColumn()
+{
+  int column = -1;
+  
+  if (d->checkboxEnabled)
+  {
+    if (d->firstColumnOffset == 1)
+      column = 0;
+    else
+      column = columns();
+  }
+  
+  return column;
+}
+
 
 
 void
@@ -415,20 +473,20 @@ YQTable::slotcolumnClicked(int               button,
                            QTreeWidgetItem * item,
                            int               col,
                            const QPoint &    pos)
-
 {
-  YQTableListViewItem * it = dynamic_cast<YQTableListViewItem*>(item);
-  YTableItem *pYTableItem = it->origItem();
-  YTableCell *pCell = pYTableItem->cell(col);
-  if (pCell->checkable())
+  if (d->checkboxEnabled && col == checkboxItemColumn())
   {
-    // it seems items contains old value when signal is emitted
-    pCell->setChecked(item->checkState(col)==Qt::CheckState::Unchecked);
-    if ( notify() )
-        YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::ValueChanged ) );
-  }
-}
+    YQTableListViewItem * it = dynamic_cast<YQTableListViewItem*>(item);
+    YTableItem *pYTableItem = it->origItem();
 
+    yuiMilestone() << "Column is checked: " << (item->checkState(col)==Qt::CheckState::Unchecked?"yes":"no") <<  std::endl;
+
+    // it seems items contains old value when signal is emitted
+    pYTableItem->setSelected(item->checkState(col)==Qt::CheckState::Unchecked);
+     if ( notify() )
+        YQUI::ui()->sendEvent( new YWidgetEvent( this, YEvent::ValueChanged ) );
+  } 
+}
 
 YQTableListViewItem::YQTableListViewItem( YQTable *	table,
 					  QY2ListView * parent,
@@ -441,12 +499,30 @@ YQTableListViewItem::YQTableListViewItem( YQTable *	table,
     YUI_CHECK_PTR( _origItem );
 
     _origItem->setData( this );
+        
+    yuiMilestone() << "item checkable? " << (table->hasCheckboxItems()?"yes":"no") 
+                   << " checkable column is " << table->checkboxItemColumn() <<  std::endl;
 
+    int table_columns = _table->columns();
+    if (table->hasCheckboxItems())
+    {
+      table_columns -= 1;
+      setCheckState(table->checkboxItemColumn(), _origItem->selected() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);      
+    }
+    
     for ( YTableCellIterator it = _origItem->cellsBegin();
 	  it != _origItem->cellsEnd();
 	  ++it )
     {
-	updateCell( *it );
+        YTableCell * cell = *it;
+        // if someone decided to have more cells for this item
+        if (cell->column() > table_columns)
+        {
+           yuiWarning() << "Item contains too many columns, current is " << cell->column() 
+                        << " but only " << _table->columns() << " columns are configured" << std::endl;
+        }
+        else
+          updateCell( *it );
     }
 }
 
@@ -458,6 +534,9 @@ YQTableListViewItem::updateCell( const YTableCell * cell )
 	return;
 
     int column = cell->column();
+    YTableMode mode = table()->selectionMode();
+    if (mode == YTableMode::YTableCheckBoxOnFirstColumn)
+      column += 1;
 
     //
     // Set label text
@@ -465,15 +544,10 @@ YQTableListViewItem::updateCell( const YTableCell * cell )
 
     setText( column, fromUTF8( cell->label() ) );
 
-
     //
     // Set icon (if specified)
     //
-    if (cell->checkable() && _table->checkable(column))
-    {
-        setCheckState(column, cell->checked() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);      
-    }
-    else if ( cell->hasIconName() )
+    if ( cell->hasIconName() )
     {
 	// _table is checked against 0 in the constructor
 

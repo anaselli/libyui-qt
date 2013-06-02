@@ -43,7 +43,7 @@ public:
     /**
      * Constructor.
      **/
-    YQTable( YWidget * parent, YTableHeader * header, bool multiSelection );
+    YQTable( YWidget * parent, YTableHeader * header, YTableMode selectionMode );
 
     /**
      * Destructor.
@@ -139,6 +139,15 @@ public:
      **/
     virtual bool setKeyboardFocus();
 
+    /**
+     * says if a checkbox column is enabled
+     */
+    bool hasCheckboxItems();
+    /**
+     * returns which column is managed by checkboxes, if any
+     * -1 otherwise
+     */
+    int  checkboxItemColumn();
 
 protected slots:
 
@@ -170,7 +179,7 @@ protected slots:
                            QTreeWidgetItem *     item,
                            int                   col,
                            const QPoint &        pos );
-
+    
 protected:
 
     /**
@@ -190,6 +199,10 @@ protected:
     //
 
     QY2ListView * _qt_listView;
+
+private:
+    struct Private;
+    Private *d;
 };
 
 
